@@ -71,12 +71,11 @@ ossimHLZ = (function ()
                 } )
             } ),
             new ol.layer.Tile( {
-                name: 'omar-mosaic',
+                name: 'hillshade',
                 source: new ol.source.TileWMS( {
-                    url: 'http://omar.ossim.org/omar/ogc/wms?',
+                    url: '/ossim-hlz/hlz/renderHillShade',
                     params: {
-                        VERSION: '1.1.1',
-                        LAYERS: '313'
+                        VERSION: '1.1.1'
                     }
                 } )
             } ),

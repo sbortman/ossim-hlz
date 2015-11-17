@@ -104,4 +104,30 @@ class HlzService
 
     [contentType: 'image/png', buffer: ostream.toByteArray()]
   }
+
+
+  def renderHillShade(def params)
+  {
+    def file = grailsApplication?.config?.hlz?.hillShade?.toString() as File
+    def geotiff = new GeoTIFF( file )
+    def raster = geotiff.read()
+    def ostream = new ByteArrayOutputStream()
+    def bounds = new Bounds( *( params['BBOX'].split( ',' )*.toDouble() ), params['SRS'] )
+
+    def map = new GeoScriptMap(
+        layers: [raster],
+        width: params['WIDTH'].toInteger(),
+        height: params['HEIGHT'].toInteger(),
+        bounds: bounds,
+        proj: bounds.proj,
+        type: 'png'
+    )
+
+    map.render(ostream)
+    map.close()
+    raster?.dispose()
+
+    [contentType: 'image/png', buffer: ostream.toByteArray()]
+
+  }
 }

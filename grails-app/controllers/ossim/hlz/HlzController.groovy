@@ -34,4 +34,11 @@ class HlzController
 
     render contentType: results.contentType, file: results.buffer
   }
+
+  def renderHillShade()
+  {
+    def results = hlzService.renderHillShade( params )
+
+    render contentType: results.contentType, file: results.buffer
+  }
 }

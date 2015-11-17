@@ -119,4 +119,5 @@ log4j.main = {
 hlz {
   supportData = '/Users/sbortman/pmr-2015/oscar/N48W114'
   tmpDir = '/tmp'
+  hillShade = '/Users/sbortman/pmr-2015/oscar/N48W114/N48W114-hillshade.tif'
 }
