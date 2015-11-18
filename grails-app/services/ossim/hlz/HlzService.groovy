@@ -8,6 +8,9 @@ import geoscript.render.Map as GeoScriptMap
 import org.ossim.oms.util.TransparentFilter
 
 import javax.imageio.ImageIO
+import java.awt.AlphaComposite
+import java.awt.Graphics2D
+import java.awt.image.BufferedImage
 
 
 class HlzService
@@ -116,6 +119,7 @@ class HlzService
 
     file?.delete()
     image = TransparentFilter.fixTransparency( new TransparentFilter(), image )
+//    image = makeTranslucent( image, 0.5 )
 
     ImageIO.write( image, map.type, ostream )
     raster?.dispose()
@@ -166,6 +170,7 @@ class HlzService
 
     file?.delete()
     image = TransparentFilter.fixTransparency( new TransparentFilter(), image )
+//    image = makeTranslucent( image, 0.5 )
 
     ImageIO.write( image, map.type, ostream )
     raster?.dispose()
@@ -197,5 +202,15 @@ class HlzService
 
     [contentType: 'image/png', buffer: ostream.toByteArray()]
 
+  }
+
+
+  private BufferedImage makeTranslucent(BufferedImage source, float alpha)
+  {
+    Graphics2D g2d = source.createGraphics();
+    g2d.setComposite( AlphaComposite.getInstance( AlphaComposite.SRC_OVER, 0.5f ) );
+    g2d.drawImage( source, 0, 0, null );
+    g2d.dispose();
+    return source;
   }
 }

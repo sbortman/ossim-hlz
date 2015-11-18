@@ -60,13 +60,24 @@ ossimHLZ = (function ()
 
     function toggleLayer( name, status )
     {
-        console.log(name, status);
+        console.log( name, status );
 
         map.getLayers().forEach( function ( layer )
         {
             if ( layer.get( 'name' ) === name )
             {
                 layer.set( 'visible', status );
+            }
+        } );
+    }
+
+    function setOverlayOpacity( name, value )
+    {
+        map.getLayers().forEach( function ( layer )
+        {
+            if ( layer.get( 'name' ) === name )
+            {
+                layer.setOpacity( value );
             }
         } );
     }
@@ -241,6 +252,10 @@ ossimHLZ = (function ()
             map.getView().setCenter( [lon, lat] );
 
         } );
+
+        setOverlayOpacity( 'hlz', 0.5 );
+        setOverlayOpacity( 'ovs', 0.5 );
+
     }
 
     return {
