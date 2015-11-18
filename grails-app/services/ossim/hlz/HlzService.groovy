@@ -27,12 +27,8 @@ class HlzService
   }
 
 
-  def runHLZ(double lat, double lon, double radiusROI, double radiusLZ, double roughness, double slope, File outputFile)
+  def runHLZ(double lat, double lon, double radiusROI, double radiusLZ, /*double roughness,*/ double slope, File outputFile)
   {
-//    def cmd = [
-//        'ossim-hlz', '--target', lat, lon, '--lut', 'hlz.lut', '--roi', radius, '--rlz', '100', outputFile.absolutePath
-//    ]
-
     def cmd = [
         "ossim-hlz",
         "--target", lat, lon,
@@ -40,9 +36,31 @@ class HlzService
         "--roi", radiusROI,
         "--rlz", radiusLZ,
         "--threads", 8,
-        "--roughness", roughness,
+//        "--roughness", roughness,
         "--slope", slope,
         outputFile.absolutePath,
+    ]
+
+    print cmd.join( ' ' )
+
+    def proc = cmd.execute()
+
+//    proc.consumeProcessOutput(System.out, System.err)
+    proc.consumeProcessOutput()
+
+    println proc.waitFor()
+  }
+
+  def runVS(double lat, double lon, double radius, double fovStart, double fovStop, double heightOfEye, File outputFile)
+  {
+    def cmd = [
+        'ossim-viewshed',
+        '--radius', radius,
+        '--fov', fovStart, fovStop,
+        '--hgt-of-eye', heightOfEye,
+        "--lut", "${grailsApplication.config.hlz.supportData}/vs.lut",
+        lat, lon,
+        outputFile.absolutePath
     ]
 
     print cmd.join( ' ' )
@@ -65,8 +83,58 @@ class HlzService
         params['lon'].toDouble(),
         params['radiusROI'].toDouble(),
         params['radiusLZ'].toDouble(),
-        params['roughness'].toDouble(),
+//        params['roughness'].toDouble(),
         params['slope'].toDouble(),
+        file
+    )
+
+    def geotiff = new GeoTIFF( file )
+    def raster = geotiff.read()
+    def ostream = new ByteArrayOutputStream()
+
+//    def info = [
+//        name: file.name,
+//        bounds: raster.bounds,
+//        width: raster.cols,
+//        height: raster.rows
+//    ]
+
+    def bounds = new Bounds( *( params['BBOX'].split( ',' )*.toDouble() ), params['SRS'] )
+
+    def map = new GeoScriptMap(
+        layers: [raster],
+        width: params['WIDTH'].toInteger(),
+        height: params['HEIGHT'].toInteger(),
+        bounds: bounds,
+        proj: bounds.proj,
+        type: 'png'
+    )
+
+    def image = map.renderToImage()
+
+    map?.close()
+
+    file?.delete()
+    image = TransparentFilter.fixTransparency( new TransparentFilter(), image )
+
+    ImageIO.write( image, map.type, ostream )
+    raster?.dispose()
+
+    [contentType: 'image/png', buffer: ostream.toByteArray()]
+  }
+
+  def renderVS(def params)
+  {
+    def tmpDir = grailsApplication?.config?.hlz?.tmpDir?.toString() as File
+    def file = File.createTempFile( 'ovs', '.tif', tmpDir )
+
+    runVS(
+        params['lat'].toDouble(),
+        params['lon'].toDouble(),
+        params['radius'].toDouble(),
+        params['fovStart'].toDouble(),
+        params['fovStop'].toDouble(),
+        params['heightOfEye'].toDouble(),
         file
     )
 
@@ -123,7 +191,7 @@ class HlzService
         type: 'png'
     )
 
-    map.render(ostream)
+    map.render( ostream )
     map.close()
     raster?.dispose()
 

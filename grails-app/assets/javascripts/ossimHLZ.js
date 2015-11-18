@@ -10,7 +10,10 @@ ossimHLZ = (function ()
 {
     "use strict";
 
-    var lat, lon, radiusROI, radiusLZ, roughness, slope, map, layers;
+    var lat, lon,
+        radiusROI, radiusLZ, roughness, slope,
+        fovStart, fovStop, heightOfEye,
+        map, layers;
 
 
     function updateHLZ()
@@ -26,13 +29,46 @@ ossimHLZ = (function ()
                 params.lon = lon;
                 params.radiusROI = radiusROI;
                 params.radiusLZ = radiusLZ;
-                params.roughness = roughness;
+                //params.roughness = roughness;
                 params.slope = slope;
 
                 source.updateParams( params );
             }
         } );
+    }
 
+    function updateVS()
+    {
+        map.getLayers().forEach( function ( layer )
+        {
+            if ( layer.get( 'name' ) == 'ovs' )
+            {
+                // Do with layer
+                var source = layer.getSource();
+                var params = source.getParams();
+                params.lat = lat;
+                params.lon = lon;
+                params.radius = radiusROI;
+                params.fovStart = fovStart;
+                params.fovStop = fovStop;
+                params.heightOfEye = heightOfEye;
+
+                source.updateParams( params );
+            }
+        } );
+    }
+
+    function toggleLayer( name, status )
+    {
+        console.log(name, status);
+
+        map.getLayers().forEach( function ( layer )
+        {
+            if ( layer.get( 'name' ) === name )
+            {
+                layer.set( 'visible', status );
+            }
+        } );
     }
 
     function onMoveEnd( evt )
@@ -48,6 +84,8 @@ ossimHLZ = (function ()
         $( '#lon' ).val( lon );
 
         updateHLZ();
+        updateVS();
+
     }
 
     function initialize( initParams )
@@ -55,10 +93,14 @@ ossimHLZ = (function ()
         lat = initParams.lat;
         lon = initParams.lon;
         radiusROI = initParams.radiusROI;
-        radiusLZ = initParams.radiusLZ;
 
-        roughness = initParams.roughness;
+        radiusLZ = initParams.radiusLZ;
+        //roughness = initParams.roughness;
         slope = initParams.slope;
+
+        fovStart = initParams.fovStart;
+        fovStop = initParams.fovStop;
+        heightOfEye = initParams.heightOfEye;
 
         layers = [
             new ol.layer.Tile( {
@@ -90,8 +132,24 @@ ossimHLZ = (function ()
                         lon: lon,
                         radiusROI: radiusROI,
                         radiusLZ: radiusLZ,
-                        roughness: roughness,
+                        //roughness: roughness,
                         slope: slope
+                    }
+                } )
+            } ),
+            new ol.layer.Image( {
+                name: 'ovs',
+                source: new ol.source.ImageWMS( {
+                    url: '/ossim-hlz/hlz/renderVS',
+                    params: {
+                        LAYERS: '',
+                        VERSION: '1.1.1',
+                        lat: lat,
+                        lon: lon,
+                        radius: radiusROI,
+                        fovStart: fovStart,
+                        fovStop: fovStop,
+                        heightOfEye: heightOfEye
                     }
                 } )
             } )
@@ -121,20 +179,65 @@ ossimHLZ = (function ()
         $( '#lon' ).val( lon );
         $( '#radiusROI' ).val( radiusROI );
         $( '#radiusLZ' ).val( radiusLZ );
-        $( '#roughness' ).val( roughness );
+        //$( '#roughness' ).val( roughness );
         $( '#slope' ).val( slope );
+        $( '#fovStart' ).val( fovStart );
+        $( '#fovStop' ).val( fovStop );
+        $( '#heightOfEye' ).val( heightOfEye );
+
+
+        $( '#toggleHLZ' ).click( function ()
+        {
+            var $this = $( this );
+            // $this will contain a reference to the checkbox
+            if ( $this.is( ':checked' ) )
+            {
+                // the checkbox was checked
+                toggleLayer( 'hlz', true );
+            }
+            else
+            {
+                // the checkbox was unchecked
+                toggleLayer( 'hlz', false );
+            }
+        } );
+
+        $( '#toggleVS' ).click( function ()
+        {
+            var $this = $( this );
+            // $this will contain a reference to the checkbox
+            if ( $this.is( ':checked' ) )
+            {
+                // the checkbox was checked
+                toggleLayer( 'ovs', true );
+            }
+            else
+            {
+                // the checkbox was unchecked
+                toggleLayer( 'ovs', false );
+            }
+        } );
+
 
         $( '#updateHLZ' ).on( 'click', function ( e )
         {
             lat = $( '#lat' ).val();
             lon = $( '#lon' ).val();
             radiusROI = $( '#radiusROI' ).val();
+
             radiusLZ = $( '#radiusLZ' ).val();
-            roughness = $( '#roughness' ).val();
+            //roughness = $( '#roughness' ).val();
             slope = $( '#slope' ).val();
 
 
+            fovStart = $( '#fovStart' ).val();
+            fovStop = $( '#fovStop' ).val();
+            heightOfEye = $( '#heightOfEye' ).val();
+
+
             updateHLZ();
+            updateVS();
+
             map.getView().setCenter( [lon, lat] );
 
         } );

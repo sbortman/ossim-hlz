@@ -21,7 +21,7 @@
     <br/>
     <div class="row alert alert-success">
         <div class="col-md-12">
-            <h1>OSSIM | HLZ</h1>
+            <h1>OSSIM | HLZ | Viewshed</h1>
         </div>
     </div>
 </div>
@@ -52,9 +52,16 @@
 
                 <div class="row">
                     <div class="col-md-12">
-                        <span id="helpBlock" class="help-block">Note: Radius vaules are in meters</span>
+                        <span id="helpBlock" class="help-block">Note: Radius values are in meters</span>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr/>
+                    </div>
+                </div>
+
 
                 <div class="row">
                     <div class="col-md-6">
@@ -73,20 +80,78 @@
                 </div>
 
                 <div class="row">
+                    <%--
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="label label-primary" for="roughness">Roughness:</label>
                             <input type="text" class="form-control" id="roughness" placeholder="0">
                         </div>
                     </div>
-
+                    --%>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="label label-primary" for="slope">Slope:</label>
                             <input type="text" class="form-control" id="slope" placeholder="0">
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input id="toggleHLZ" type="checkbox" checked>Toggle HLZ
+                            </label>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <hr/>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="label label-primary" for="fovStart">Field of View Start:</label>
+                            <input type="text" class="form-control" id="fovStart" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="label label-primary" for="fovStop">Field of View Stop:</label>
+                            <input type="text" class="form-control" id="fovStop" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="label label-primary" for="heightOfEye">Height of Eye:</label>
+                            <input type="text" class="form-control" id="heightOfEye" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input id='toggleVS' type="checkbox" checked>Toggle VS
+                            </label>
+                        </div>
+                    </div>
+
+                    <%--
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="label label-primary" for="fovStop">Field of View Stop:</label>
+                            <input type="text" class="form-control" id="fovStop" placeholder="0">
+                        </div>
+                    </div>
+                    --%>
+                </div>
+
 
 
                 <div class="row">
